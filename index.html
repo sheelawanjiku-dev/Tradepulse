@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TradePulse Pro | NSE & Crypto</title>
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --up: #22c55e; --down: #ef4444; --gold: #eab308; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #f1f5f9; line-height: 1.5; transition: background 0.3s; }
+        
+        /* App Header */
+        .app-header { padding: 20px; background: var(--card); border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 800; letter-spacing: -1px; color: var(--accent); font-size: 1.2rem; }
+        .sync-indicator { font-size: 0.65rem; color: var(--up); font-family: 'JetBrains Mono', monospace; }
+
+        /* Main Sections */
+        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+        .section-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #64748b; margin: 20px 0 10px 5px; }
+
+        /* Arbitrage & Alert Panel */
+        .tool-panel { background: #1e293b; border-radius: 16px; padding: 18px; border: 1px solid #334155; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        label { font-size: 0.65rem; color: #94a3b8; margin-bottom: 4px; display: block; }
+        input { background: #0f172a; border: 1px solid #475569; color: white; padding: 12px; border-radius: 8px; width: 100%; font-family: 'JetBrains Mono', monospace; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--accent); }
+
+        /* Asset Rows */
+        .asset-card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid transparent; }
+        .asset-info h4 { font-size: 1rem; font-weight: 700; }
+        .asset-info p { font-size: 0.75rem; color: #94a3b8; }
+        .asset-values { text-align: right; }
+        .price-main { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.1rem; }
+        .price-sub { font-size: 0.8rem; font-weight: 600; }
+
+        /* Alert States */
+        .flash-red { animation: pulse-red 1s infinite; }
+        .flash-green { animation: pulse-green 1s infinite; }
+        @keyframes pulse-red { 0%, 100% { background: #0f172a; } 50% { background: #450a0a; } }
+        @keyframes pulse-green { 0%, 100% { background: #0f172a; } 50% { background: #064e3b; } }
+
+        .news-item { font-size: 0.85rem; padding: 12px; border-bottom: 1px solid #334155; color: #cbd5e1; }
+        .badge { background: #334155; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-right: 5px; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">TRADEPULSE PRO</div>
+        <div class="sync-indicator" id="sync-status">● LIVE SYNC</div>
+    </header>
+
+    <div class="container">
+        
+        <div class="section-title">Visual Price Alerts</div>
+        <div class="tool-panel" style="border-left: 4px solid var(--accent);">
+            <div class="grid-2">
+                <div>
+                    <label>RED FLASH BELOW ($)</label>
+                    <input type="number" id="alertLow" placeholder="65000">
+                </div>
+                <div>
+                    <label>GREEN FLASH ABOVE ($)</label>
+                    <input type="number" id="alertHigh" placeholder="75000">
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Quick Profit (Arbitrage)</div>
+        <div class="tool-panel" style="border-left: 4px solid var(--gold);">
+            <div class="grid-2">
+                <input type="number" id="buyX" placeholder="Buy Price ($)" oninput="doCalc()">
+                <input type="number" id="sellX" placeholder="Sell Price ($)" oninput="oninput="doCalc()">
+            </div>
+            <div id="profitRes" style="margin-top:15px; text-align:center; font-weight:800; color:var(--gold);">
+                $0.00 Profit (KSh 0)
+            </div>
+        </div>
+
+        <div class="section-title">Crypto Assets (Live)</div>
+        <div id="crypto-list"></div>
+
+        <div class="section-title">Nairobi Securities (March 2026)</div>
+        <div class="asset-card">
+            <div class="asset-info"><h4>Safaricom (SCOM)</h4><p>Telecom & Mobile Money</p></div>
+            <div class="asset-values"><div class="price-main">KSh 30.55</div><div class="price-sub" style="color:var(--down)">▼ -0.26%</div></div>
+        </div>
+        <div class="asset-card">
+            <div class="asset-info"><h4>Equity Bank (EQTY)</h4><p>Banking & Finance</p></div>
+            <div class="asset-values"><div class="price-main">KSh 74.50</div><div class="price-sub" style="color:var(--up)">▲ +1.49%</div></div>
+        </div>
+        <div class="asset-card">
+            <div class="asset-info"><h4>KCB Group (KCB)</h4><p>Banking & Finance</p></div>
+            <div class="asset-values"><div class="price-main">KSh 74.25</div><div class="price-sub" style="color:var(--up)">▲ +1.13%</div></div>
+        </div>
+
+        <div class="section-title">Market Headlines</div>
+        <div class="tool-panel">
+            <div class="news-item"><span class="badge">NSE</span> Kenya Pipeline IPO oversubscribed by 105% (KSh 106Bn raised)</div>
+            <div class="news-item"><span class="badge">SCOM</span> Ziidi Trader hits record 25,000 daily trades via M-Pesa</div>
+            <div class="news-item"><span class="badge">CBK</span> Treasury targets KES 60 Billion in new Bond auction</div>
+        </div>
+
+    </div>
+
+    <script>
+        const KES_RATE = 129.20;
+        const coins = ['bitcoin', 'ethereum', 'solana', 'binancecoin'];
+
+        async function updateMarket() {
+            try {
+                const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(',')}&vs_currencies=usd&include_24hr_change=true`);
+                const data = await res.json();
+                
+                const list = document.getElementById('crypto-list');
+                list.innerHTML = '';
+
+                coins.forEach(id => {
+                    const usd = data[id].usd;
+                    const change = data[id].usd_24h_change.toFixed(2);
+                    const isUp = change >= 0;
+
+                    list.innerHTML += `
+                        <div class="asset-card">
+                            <div class="asset-info"><h4 style="text-transform:capitalize">${id}</h4><p>Global Market</p></div>
+                            <div class="asset-values">
+                                <div class="price-main">$${usd.toLocaleString()}</div>
+                                <div class="price-sub" style="color:${isUp ? 'var(--up)' : 'var(--down)'}">
+                                    ${isUp ? '▲' : '▼'} ${Math.abs(change)}%
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                checkAlerts(data.bitcoin.usd);
+                document.getElementById('sync-status').innerText = "● SYNCED " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            } catch (e) { document.getElementById('sync-status').innerText = "○ OFFLINE"; }
+        }
+
+        function checkAlerts(btcPrice) {
+            const low = document.getElementById('alertLow').value;
+            const high = document.getElementById('alertHigh').value;
+            document.body.classList.remove('flash-red', 'flash-green');
+
+            if (low && btcPrice <= low) document.body.classList.add('flash-red');
+            else if (high && btcPrice >= high) document.body.classList.add('flash-green');
+        }
+
+        function doCalc() {
+            const b = document.getElementById('buyX').value || 0;
+            const s = document.getElementById('sellX').value || 0;
+            const diff = s - b;
+            const kes = diff * KES_RATE;
+            const res = document.getElementById('profitRes');
+            res.innerText = `$${diff.toLocaleString()} Profit (KSh ${kes.toLocaleString()})`;
+            res.style.color = diff > 0 ? "var(--up)" : "var(--down)";
+        }
+
+        setInterval(updateMarket, 15000);
+        updateMarket();
+    </script>
+</body>
+              </html>
+              
